@@ -1,27 +1,26 @@
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 public class TicketService {
 
     public List<Ticket> convertJSONToObject(String filename) throws IOException {
-        String filePath = Objects.requireNonNull(getClass().getClassLoader().getResource(filename)).getPath();
+        InputStream inputStream = getClass().getResourceAsStream("/" + filename);
 
         ObjectMapper objectMapper = new ObjectMapper();
         SimpleModule module = new SimpleModule();
         module.addDeserializer(LocalDate.class, new CustomDateDeserializer("dd.MM.yy"));
         module.addDeserializer(LocalTime.class, new CustomTimeDeserializer("H:mm"));
         objectMapper.registerModule(module);
-        TicketList list = objectMapper.readValue(new File(filePath), TicketList.class);
+        TicketList list = objectMapper.readValue(inputStream, TicketList.class);
 
         return list.getTickets();
     }
